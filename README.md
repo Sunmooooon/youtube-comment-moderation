@@ -4,6 +4,14 @@ A local Flask application for reviewing YouTube comments. It uses Gemini to iden
 
 The original project used `gemini-2.0-flash`. The model name is now configurable through `GEMINI_MODEL`.
 
+## Background
+
+Online gambling is prohibited in Indonesia, but gambling operators still promote their sites through social media. One common method is to use automated or coordinated accounts to flood the comment sections of creators and other high-reach accounts with repeated promotional messages, disguised brand names, and links. Indonesia's Ministry of Communication and Digital Affairs has also reported organized gambling spam targeting creators and influencers across platforms, including YouTube ([Komdigi, 2026](https://portal.komdigi.go.id/kanal-publik/berita-kini/10355)).
+
+For creators, this spam pushes genuine discussion out of view and makes comment sections less useful to their audience. When viewers repeatedly encounter gambling promotions instead of relevant conversation, they may be less willing to read or leave comments. This project was created to help identify that spam while still providing useful sentiment analysis for legitimate comments.
+
+The detection prompt, examples, and classification criteria are written for Indonesian-language comments. They include Indonesian slang and obfuscation patterns commonly found in local gambling promotion. The classifier has not been evaluated for other languages.
+
 ## What it does
 
 - Searches for YouTube channels and lists their recent videos.
