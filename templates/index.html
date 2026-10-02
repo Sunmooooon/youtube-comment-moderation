@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>YouTube Comment Intelligence</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  </head>
+  <body>
+    <header class="hero">
+      <div class="hero__content">
+        <p class="eyebrow">YouTube Comment Intelligence</p>
+        <h1>Temukan insight. Saring promosi judol.</h1>
+        <p class="hero__description">
+          Dashboard riset untuk membaca respons audiens, mendeteksi promosi judi
+          online dengan Gemini, dan memoderasi komentar melalui akun Google pemilik channel.
+        </p>
+      </div>
+    </header>
+
+    <main class="container">
+      {% if config_missing %}
+        <section class="notice notice--warning" role="alert">
+          <strong>Konfigurasi belum lengkap.</strong>
+          Isi <code>{{ config_missing|join(', ') }}</code> di file <code>.env</code>.
+          Ikuti petunjuk pada README.
+        </section>
+      {% endif %}
+
+      {% if error %}
+        <section class="notice notice--error" role="alert">{{ error }}</section>
+      {% endif %}
+
+      <section class="panel search-panel">
+        <form method="post" class="search-form">
+          <label for="creator">Nama channel YouTube</label>
+          <div class="search-form__row">
+            <input
+              id="creator"
+              type="search"
+              name="creator"
+              placeholder="Contoh: Kok Bisa?"
+              required
+              value="{{ creator }}"
+              {% if config_missing %}disabled{% endif %}
+            >
+            <button type="submit" {% if config_missing %}disabled{% endif %}>Cari channel</button>
+          </div>
+        </form>
+      </section>
+
+      {% if channel_choices %}
+        <section class="panel">
+          <h2>Pilih channel</h2>
+          <form method="post">
+            <input type="hidden" name="creator" value="{{ creator }}">
+            <div class="channel-grid">
+              {% for choice in channel_choices %}
+                <label class="channel-choice">
+                  <input type="radio" name="channel_id" value="{{ choice.id }}" {% if loop.first %}checked{% endif %}>
+                  <img src="{{ choice.thumbnail }}" alt="" width="56" height="56">
+                  <span>
+                    <strong>{{ choice.title }}</strong>
+                    <small>{{ choice.id }}</small>
+                  </span>
+                </label>
+              {% endfor %}
+            </div>
+            <button type="submit">Buka dashboard</button>
+          </form>
+        </section>
+      {% endif %}
+
+      {% if channel %}
+        <section class="dashboard">
+          <aside class="panel channel-card">
+            <img src="{{ channel.thumbnail }}" alt="Foto profil {{ channel.title }}" width="120" height="120">
+            <h2>{{ channel.title }}</h2>
+            <dl>
+              <div><dt>Subscriber</dt><dd>{{ channel.statistics.subscriberCount|default('Disembunyikan') }}</dd></div>
+              <div><dt>Video</dt><dd>{{ channel.statistics.videoCount|default('0') }}</dd></div>
+              <div><dt>Views</dt><dd>{{ channel.statistics.viewCount|default('0') }}</dd></div>
+            </dl>
+          </aside>
+
+          <section class="panel video-section">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">Video terbaru</p>
+                <h2>Pilih video untuk dianalisis</h2>
+              </div>
+              <span class="mode-badge {{ 'mode-badge--active' if auto_moderation else '' }}">
+                Moderasi otomatis: {{ 'aktif' if auto_moderation else 'nonaktif' }}
+              </span>
+            </div>
+            <div class="video-grid">
+              {% for video in videos %}
+                <button class="video-card" type="button" data-video-id="{{ video.id }}">
+                  <img src="{{ video.thumbnail }}" alt="" loading="lazy">
+                  <span>{{ video.title }}</span>
+                </button>
+              {% else %}
+                <p>Tidak ada video publik yang ditemukan.</p>
+              {% endfor %}
+            </div>
+          </section>
+        </section>
+      {% endif %}
+    </main>
+
+    <dialog id="video-dialog" class="video-dialog">
+      <div class="dialog-header">
+        <div>
+          <p class="eyebrow">Detail video</p>
+          <h2 id="video-title">Memuat…</h2>
+        </div>
+        <button id="close-dialog" class="icon-button" type="button" aria-label="Tutup">×</button>
+      </div>
+      <div id="video-stats" class="stats-row"></div>
+      <div class="dialog-actions">
+        <button id="process-video" type="button">Analisis komentar</button>
+        <span id="process-status" role="status"></span>
+      </div>
+      <div class="dialog-grid">
+        <section>
+          <h3>Komentar</h3>
+          <div id="comment-list" class="comment-list"></div>
+        </section>
+        <section>
+          <h3>Highlight sentimen</h3>
+          <pre id="analysis" class="analysis">Belum ada analisis.</pre>
+        </section>
+      </div>
+    </dialog>
+
+    <script>
+      window.APP_CONFIG = {{ {"autoModeration": auto_moderation}|tojson }};
+    </script>
+    <script src="{{ url_for('static', filename='main.js') }}"></script>
+  </body>
+</html>

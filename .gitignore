@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.venv/
+venv/
+
+# Local configuration and Google credentials
+.env
+.env.*
+!.env.example
+secrets/
+client_secret*.json
+credentials*.json
+token*.json
+
+# Generated runtime data (may contain YouTube comments and account metadata)
+data/runtime/*
+!data/runtime/.gitkeep
+*.log
+
+# Notebook and editor noise
+.ipynb_checkpoints/
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
